@@ -15,12 +15,27 @@ export class ConanDependenciesProvider implements vscode.TreeDataProvider<ConanD
     }
 
     constructor(private workspace: string | undefined){
-
+        
     }
 
 }
 
 class ConanDependency extends vscode.TreeItem
 {
-    
+    constructor(
+        public readonly label: string,
+        private version: string,
+        public readonly channel: string,
+        public readonly collapsibleState: vscode.TreeItemCollapsibleState
+    )
+    {
+        super(label, collapsibleState);
+    }
+
+    get tooltip(): string {
+        return `${this.label}-${this.version}@${this.channel}`;
+    }
+
+    iconPath = path.join(__filename, '..', '..', '..', 'res', 'dependency.svg');
+    contextValue = 'dependency';
 }
