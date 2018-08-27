@@ -27,8 +27,12 @@
         "views": {
             "conan_tools":[
                 {
-                    "id": "conan.info",
-                    "name": "conan info"
+                    "id": "conan.install",
+                    "name": "conan install"
+                },
+                {
+                    "id":"conan.build",
+                    "name": "conan build"
                 }
             ]
 		},
@@ -36,8 +40,27 @@
             {
                 "command": "extension.sayHello",
                 "title": "Hello World"
+            },
+            {
+                "command": "conan.install",
+                "title": "Install Conan Dependencies",
+                "icon": "res/conan_install.svg"
             }
-        ]
+        ],
+        "menus": {
+            "commandPalette": [
+                {
+                    "command": "conan.install"
+                }
+            ],
+            "view/title": [
+                {
+                    "command": "conan.install",
+                    "when": "view == conan.install",
+                    "group": "navigation"
+                }
+            ]
+        }
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
