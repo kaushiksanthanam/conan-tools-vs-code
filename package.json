@@ -11,10 +11,27 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.sayHello"
+        "workspaceContains:conanfile.py"
     ],
     "main": "./out/extension",
     "contributes": {
+        "viewsContainers": {
+			"activitybar": [
+				{
+					"id": "conan_tools",
+					"title": "Conan Tools",
+					"icon": "res/conan_icon.svg"
+				}
+			]
+        },
+        "views": {
+            "conan_tools":[
+                {
+                    "id": "conan.info",
+                    "name": "conan info"
+                }
+            ]
+		},
         "commands": [
             {
                 "command": "extension.sayHello",
