@@ -16,7 +16,27 @@ export class ConanDependenciesProvider implements vscode.TreeDataProvider<ConanD
     }
 
     getChildren(element?: ConanDependency): vscode.ProviderResult<ConanDependency[]> {
-        throw "hi";
+        let ret: ConanDependency[];
+        if (element === undefined) {
+            this.dependencies.forEach(dep => {
+                if (dep.parent.label.includes('@PROJECT')) {
+                    ret = dep.children;
+                }
+            });
+        } else {
+            this.dependencies.forEach(dep => {
+                if (dep.parent.label === element.label) {
+                    ret = dep.children;
+                }
+            });
+        }
+        return new Promise((resolve, rejected) => {
+            if (ret) {
+                resolve(ret);
+            } else {
+                rejected(Error('getChildren() Method cannot return dependency list'));
+            }
+        });
     }
 
     refresh() {
@@ -28,21 +48,21 @@ export class ConanDependenciesProvider implements vscode.TreeDataProvider<ConanD
         // 2. collect the results into txt file
         // 3. Read and parse the text file
         // 4. Create the Conan Dependencies Tree Items
-        let command = 'conan info ' + workspace + '/ --g=' + workspace + '/.conan_tools/conanInfo.dot';
+        let command = 'conan info ' + this.workspace + '/ --g=' + this.workspace + '/.conan_tools/conanInfo.dot';
         exec(command, (err, stdout, stderr) => {
             if (err) {
                 vscode.window.showErrorMessage("Failed to grab conan information");
-                exec('conan install .', { cwd: workspace, maxBuffer: 1024 * 2000 }, (err, stdout, stderr) => {
+                exec('conan install .', { cwd: this.workspace, maxBuffer: 1024 * 2000 }, (err, stdout, stderr) => {
                     vscode.window.showErrorMessage("Conan Tools: Failed to get conan info");
-                    fs.writeFileSync(workspace + "/.conan_tools/info.log", stdout.toString());
+                    fs.writeFileSync(this.workspace + "/.conan_tools/info.log", stdout.toString());
 
-                    let infoLogUri = vscode.Uri.file(workspace + "/.conan_tools/info.log");
+                    let infoLogUri = vscode.Uri.file(this.workspace + "/.conan_tools/info.log");
                     vscode.window.showTextDocument(infoLogUri);
                 });
             }
             else {
                 // Read from conanInfo.dot file
-                fs.readFile(workspace + "/.conan_tools/conanInfo.dot", (err, data) => {
+                fs.readFile(this.workspace + "/.conan_tools/conanInfo.dot", (err, data) => {
                     if (err) {
                         vscode.window.showErrorMessage("Could not read conanInfo.dot");
                     }
