@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { execSync, exec } from 'child_process';
+const File = require('File');
 
 export class ConanDependenciesProvider implements vscode.TreeDataProvider<ConanDependency>
 {
