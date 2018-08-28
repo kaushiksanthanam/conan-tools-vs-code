@@ -7,7 +7,7 @@ import * as path from 'path';
 
 
 import { ConanDependenciesProvider } from './conanDependencies';
-import { execSync, exec } from 'child_process';
+import { exec } from 'child_process';
 import { ProgressLocation } from 'vscode';
 
 let rootPath:string | undefined;
@@ -34,7 +34,7 @@ export function activate(context: vscode.ExtensionContext) {
             title: "Conan Tools"
         }, (progress, token) => {
             let p = new Promise(resolve => {
-                progress.report({message: "Installing" });
+                progress.report({message: "Installing conan dependencies" });
                 setImmediate(() => {
                     
                     // Create build directory if non existent
@@ -43,11 +43,18 @@ export function activate(context: vscode.ExtensionContext) {
                         fs.mkdirSync(vscode.workspace.rootPath + '/build/');
                     }
 
-                    exec('conan install ..', {cwd: buildPath}, (err, stdout, stderr) => {
+                    exec('conan install ..', {cwd: buildPath, maxBuffer: 1024 * 2000}, (err, stdout, stderr) => {
                         if(err)
                         {
-                            progress.report({message: "Install Failed. " + stderr.toString()});
-                            vscode.window.showErrorMessage(stderr.toString());
+                            progress.report({message: "Install Failed"});
+                            vscode.window.showErrorMessage("Install Failed");
+
+                            vscode.window.showErrorMessage("Conan Tools: Installing Dependencies Failed");
+                            fs.writeFileSync(conan_tmpFolder + "/install.log", stdout.toString());
+                            
+                            let installLogUri = vscode.Uri.file(conan_tmpFolder + "/install.log");
+                            vscode.window.showTextDocument(installLogUri);
+
                         } else {
                             vscode.window.showInformationMessage('Conan Tools: Installed conan dependencies');
                         }
@@ -62,7 +69,7 @@ export function activate(context: vscode.ExtensionContext) {
     });
 
     vscode.commands.registerCommand('conan.build', () => {
-
+        
         vscode.window.withProgress({
             location:ProgressLocation.Notification,
             title: "Conan Tools"    
@@ -76,10 +83,14 @@ export function activate(context: vscode.ExtensionContext) {
                         fs.mkdirSync(vscode.workspace.rootPath + '/build/');
                     }
                     
-                    exec('conan build ..', {cwd: buildPath}, (err, stdout, stderr) => {
+                    exec('conan build ..', {cwd: buildPath, maxBuffer: 1024 * 2000}, (err, stdout, stderr) => {
                         if(err){
-                            progress.report({message: "Build Failed. " + err.stack});
-                            vscode.window.showErrorMessage(err.stack ? err.stack.toString(): "Build Failed");
+                            progress.report({message: "Build Failed"});      
+                            vscode.window.showErrorMessage("Conan Tools: Build Failed");
+                            fs.writeFileSync(conan_tmpFolder + "/build.log", stdout.toString());
+                            
+                            let buildLogUri = vscode.Uri.file(conan_tmpFolder + "/build.log");
+                            vscode.window.showTextDocument(buildLogUri, {viewColumn: vscode.ViewColumn.Beside});
                         } else {
                             progress.report({message: "Build completed"});
                             vscode.window.showInformationMessage("Conan Tools: Build completed");

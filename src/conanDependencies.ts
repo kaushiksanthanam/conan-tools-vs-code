@@ -41,7 +41,7 @@ export class ConanDependenciesProvider implements vscode.TreeDataProvider<ConanD
                             if(split.length > 0) {
                                 let parent = split[0];
                                 let children = split[1];
-                                vscode.window.showInformationMessage(parent.toString());
+                                
                             }
                        });
                    }
