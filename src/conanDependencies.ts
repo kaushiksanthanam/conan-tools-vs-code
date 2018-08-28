@@ -1,23 +1,29 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { execSync, exec } from 'child_process';
-const File = require('File');
+import { exec } from 'child_process';
+
 
 export class ConanDependenciesProvider implements vscode.TreeDataProvider<ConanDependency>
 {
-    onDidChangeTreeData?: vscode.Event<ConanDependency | null | undefined> | undefined;
+
+    private _onDidChangeTreeData: vscode.EventEmitter<ConanDependency | undefined> = new vscode.EventEmitter<ConanDependency | undefined>();
+    readonly onDidChangeTreeData?: vscode.Event<ConanDependency | undefined | null> = this._onDidChangeTreeData.event;
     
 
     getTreeItem(element: ConanDependency): vscode.TreeItem | Thenable<vscode.TreeItem> {
         return element;
     }
 
-    getChildren(element?: ConanDependency | undefined): vscode.ProviderResult<ConanDependency[]> {
-        throw new Error("Method not implemented.");
+    getChildren(element?: ConanDependency): vscode.ProviderResult<ConanDependency[]> {
+        throw "hi";
     }
 
-    constructor(private workspace: string | undefined) {
+    refresh() {
+        this._onDidChangeTreeData.fire();
+    }
+
+    constructor(private workspace: string | undefined, private dependencies: Dependency[] = []) {
        // 1. run conan info command
        // 2. collect the results into txt file
        // 3. Read and parse the text file
@@ -25,7 +31,14 @@ export class ConanDependenciesProvider implements vscode.TreeDataProvider<ConanD
        let command = 'conan info ' + workspace + '/ --g=' + workspace + '/.conan_tools/conanInfo.dot';
        exec(command, (err, stdout, stderr) => {
            if(err){
-               vscode.window.showErrorMessage("Failed to grab conan information. " + stderr.toString());
+               vscode.window.showErrorMessage("Failed to grab conan information");
+               exec('conan install .', {cwd: workspace, maxBuffer: 1024 * 2000}, (err, stdout, stderr) => {
+                vscode.window.showErrorMessage("Conan Tools: Failed to get conan info");
+                fs.writeFileSync(workspace + "/.conan_tools/info.log", stdout.toString());
+                
+                let infoLogUri = vscode.Uri.file(workspace + "/.conan_tools/info.log");
+                vscode.window.showTextDocument(infoLogUri);
+               });
            }
            else{
                // Read from conanInfo.dot file
@@ -33,80 +46,59 @@ export class ConanDependenciesProvider implements vscode.TreeDataProvider<ConanD
                    if(err){
                        vscode.window.showErrorMessage("Could not read conanInfo.dot");
                    }
-                   else{
+                   else {
                        let fileContents = data.toString();
                        let lines = fileContents.split('\n');
                        
                        lines.forEach(line => {
-                            let split = line.split("->");
-                            if(split.length > 0) {
-                                let parent = split[0];
-                                let children = split[1];
-                                
-                            }
+                           if(!(line.startsWith("}")) && !(line.startsWith('digraph'))) {
+                                let split = line.split("->");
+                                if(split.length > 0) {
+                                    let parentLabel = split[0];                                    
+                                    parentLabel = parentLabel.replace("\"", "");
+                                    let parentConan = new ConanDependency(parentLabel, vscode.TreeItemCollapsibleState.Collapsed);
+                                    
+                                    let childrenConan: ConanDependency[] = [];
+                                    let children = split[1];
+                                    children = children.replace("{", "");
+                                    children = children.replace("}", "");
+                                    let cleanChildren = children.split(" ");
+                                    cleanChildren.forEach(cleanChild => {
+                                        cleanChild = cleanChild.replace("\"", "");
+                                        let cleanChildConan = new ConanDependency(cleanChild, vscode.TreeItemCollapsibleState.Collapsed);
+                                        childrenConan.push(cleanChildConan);
+                                    });
+
+                                    let dependency = new Dependency(parentConan, childrenConan);
+                                    this.dependencies.push(dependency);
+                                    this.refresh();
+                                }
+                           }                            
                        });
-                   }
+                    }
                });
            }
        });
        
     }
-
-    private getConanDependencies(conanFilePath: string): void {
-        exec('conan info .  -j > ./conan-tools/conanInstallInfo.txt', (error, stdout, stderr) => {
-            console.log('stdout: ' + stdout);
-            console.log('stderr: ' + stderr);
-            if (error !== null) {
-                console.log('exec error: ' + error);
-            }
-        });
-        if (fs.exists('tmpConanOutput.txt', () => {
-            //Readin txt file:
-            const file = new File('tmpConanOutput.txt');
-            let ret = Array<ConanDependency>();
-            // TODO: TEST THIS METHOD
-            // Read in input line by line
-            // Line starts from \n then skip
-            
-            file.open('r');
-            while (!file.eof) {
-                // read each line of text
-                const inputLine = file.readln();
-                if(inputLine.charAt(0) === ' ') {
-                    continue;
-                }
-                const firstWord = inputLine.split(' ')[0];
-                if(firstWord === 'Downloading' || firstWord === 'Version') {
-                    continue;
-                }
-                // Otherwise:
-                const versionLibInfo = inputLine.split('/');
-                const LibName = versionLibInfo[0];
-                const versionInfo = versionLibInfo[1].split('@');
-                const versionNumber = versionInfo[0];
-                const channelInfo = versionInfo[1];
-                const item = new ConanDependency(LibName, versionNumber, channelInfo, vscode.TreeItemCollapsibleState.None);
-                ret.push(item);
-            }
-        })) {
-
-        }
-    }
-
 }
 
+class Dependency{
+    constructor(public readonly parent: ConanDependency,
+    public readonly children: ConanDependency[]){
+
+    }
+}
 class ConanDependency extends vscode.TreeItem {
     constructor(
         public readonly label: string,
-        private version: string,
-        public readonly channel: string,
         public readonly collapsibleState: vscode.TreeItemCollapsibleState
     ) {
         super(label, collapsibleState);
     }
 
     get tooltip(): string {
-        return `${this.label}-${this.version}@${this.channel}`;
+        return `${this.label}`;
     }
 
     iconPath = path.join(__filename, '..', '..', '..', 'res', 'dependency.svg');

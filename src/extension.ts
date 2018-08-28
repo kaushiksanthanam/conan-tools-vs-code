@@ -57,6 +57,7 @@ export function activate(context: vscode.ExtensionContext) {
 
                         } else {
                             vscode.window.showInformationMessage('Conan Tools: Installed conan dependencies');
+                            conanDependencyProvider.refresh();
                         }
                         resolve();
                     });
