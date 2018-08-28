@@ -25,39 +25,62 @@
 			]
         },
         "views": {
-            "conan_tools":[
+            "explorer":[
                 {
-                    "id": "conan.install",
-                    "name": "conan install"
-                },
-                {
-                    "id":"conan.build",
-                    "name": "conan build"
+                    "id": "conan.configure",
+                    "name": "conan"
                 }
             ]
 		},
         "commands": [
             {
-                "command": "extension.sayHello",
-                "title": "Hello World"
+                "command": "conan.install",
+                "title": "Install",
+                "icon": "res/conan_install.svg"
             },
             {
-                "command": "conan.install",
-                "title": "Install Conan Dependencies",
-                "icon": "res/conan_install.svg"
+                "command": "conan.build",
+                "title": "Build",
+                "icon": "res/conan_build.png"
+            },
+            {
+                "command": "conan.selectProfile",
+                "title":"Select a conan profile"
+            },
+            {
+                "command": "conan.options",
+                "title": "Set options for conan install"
             }
         ],
         "menus": {
             "commandPalette": [
                 {
                     "command": "conan.install"
+                },
+                {
+                    "command": "conan.build"
                 }
             ],
             "view/title": [
                 {
-                    "command": "conan.install",
-                    "when": "view == conan.install",
+                    "command": "conan.build",
+                    "when": "view == conan.configure",
                     "group": "navigation"
+                },
+                {
+                    "command": "conan.install",
+                    "when": "view == conan.configure",
+                    "group": "navigation"
+                },
+                {
+                    "command": "conan.selectProfile",
+                    "when": "view == conan.configure"
+                    
+                },
+                {
+                    "command": "conan.options",
+                    "when": "view == conan.configure"
+                    
                 }
             ]
         }
