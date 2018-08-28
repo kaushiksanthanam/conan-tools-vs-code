@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { execSync, exec } from 'child_process';
+const File = require('File');
 
 export class ConanDependenciesProvider implements vscode.TreeDataProvider<ConanDependency>
 {
@@ -52,41 +53,44 @@ export class ConanDependenciesProvider implements vscode.TreeDataProvider<ConanD
     }
 
     private getConanDependencies(conanFilePath: string): void {
-        // exec('conan info .  -j > ./conan-tools/conanInstallInfo.txt', (error, stdout, stderr) => {
-        //     console.log('stdout: ' + stdout);
-        //     console.log('stderr: ' + stderr);
-        //     if (error !== null) {
-        //         console.log('exec error: ' + error);
-        //     }
-        // });
-        // if (fs.exists('tmpConanOutput.txt', () => {
-        //     //Readin txt file:
-        //     const input = fs.createReadStream('tmpConanOutput.txt');
-        //     let ret = Array<ConanDependency>();
-        //     // TODO:
-        //     // Read in input line by line
-        //     // Line starts from \n then skip
-        //     /*
-        //     while (inputLine.length() >0 ) {
-        //         if(inputLine.startWith('\n)) {
-        //             skipThisLine();
-        //         }
-        //         if (inputLine.firstWord === 'Downloading') {
-        //             skipThisLine();
-        //         } 
-        //         if (inputLine.firstWord === 'Version') {
-        //             skipThisLine(); //Because it's not actual part.
-        //         }
-        //         versionLibInfo = inputLine.split('/');
-        //         // Please match the dependency format.
-        //         libItem = new ConanDependency(versionLibInfo[0],versionLibInfo[1],versionLibInfo[2]);
-        //         ret.push(libItem);
-        //     }
-        //     */
+        exec('conan info .  -j > ./conan-tools/conanInstallInfo.txt', (error, stdout, stderr) => {
+            console.log('stdout: ' + stdout);
+            console.log('stderr: ' + stderr);
+            if (error !== null) {
+                console.log('exec error: ' + error);
+            }
+        });
+        if (fs.exists('tmpConanOutput.txt', () => {
+            //Readin txt file:
+            const file = new File('tmpConanOutput.txt');
+            let ret = Array<ConanDependency>();
+            // TODO: TEST THIS METHOD
+            // Read in input line by line
+            // Line starts from \n then skip
             
-        // })) {
+            file.open('r');
+            while (!file.eof) {
+                // read each line of text
+                const inputLine = file.readln();
+                if(inputLine.charAt(0) === ' ') {
+                    continue;
+                }
+                const firstWord = inputLine.split(' ')[0];
+                if(firstWord === 'Downloading' || firstWord === 'Version') {
+                    continue;
+                }
+                // Otherwise:
+                const versionLibInfo = inputLine.split('/');
+                const LibName = versionLibInfo[0];
+                const versionInfo = versionLibInfo[1].split('@');
+                const versionNumber = versionInfo[0];
+                const channelInfo = versionInfo[1];
+                const item = new ConanDependency(LibName, versionNumber, channelInfo, vscode.TreeItemCollapsibleState.None);
+                ret.push(item);
+            }
+        })) {
 
-        // }
+        }
     }
 
 }
