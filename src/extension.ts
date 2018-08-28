@@ -26,6 +26,7 @@ export function activate(context: vscode.ExtensionContext) {
         fs.mkdirSync(conan_tmpFolder);
     }
     const conanDependencyProvider = new ConanDependenciesProvider(rootPath);
+    vscode.window.registerTreeDataProvider('conan.configure', conanDependencyProvider);
 
     vscode.commands.registerCommand('conan.install', () => {
         
