@@ -49,7 +49,7 @@ export function activate(context: vscode.ExtensionContext) {
                             progress.report({message: "Install Failed"});
                             vscode.window.showErrorMessage("Install Failed");
 
-                            vscode.window.showErrorMessage("Conan Tools: Installing Dependencies Failed");
+                            vscode.window.showErrorMessage("Conan Tools: Installing dependencies failed");
                             fs.writeFileSync(conan_tmpFolder + "/install.log", stdout.toString());
                             
                             let installLogUri = vscode.Uri.file(conan_tmpFolder + "/install.log");
@@ -87,14 +87,14 @@ export function activate(context: vscode.ExtensionContext) {
                     exec('conan build ..', {cwd: buildPath, maxBuffer: 1024 * 2000}, (err, stdout, stderr) => {
                         if(err){
                             progress.report({message: "Build Failed"});      
-                            vscode.window.showErrorMessage("Conan Tools: Build Failed");
+                            vscode.window.showErrorMessage("Conan Tools: Build failed");
                             fs.writeFileSync(conan_tmpFolder + "/build.log", stdout.toString());
                             
                             let buildLogUri = vscode.Uri.file(conan_tmpFolder + "/build.log");
                             vscode.window.showTextDocument(buildLogUri, {viewColumn: vscode.ViewColumn.Beside});
                         } else {
                             progress.report({message: "Build completed"});
-                            vscode.window.showInformationMessage("Conan Tools: Build completed");
+                            vscode.window.showInformationMessage("Conan Tools: Build succeeded");
                         }
                         resolve();
                     });
