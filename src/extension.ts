@@ -3,7 +3,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import * as fs from 'fs';
-import * as path from 'path';
+// import * as path from 'path';
 
 
 import { ConanDependenciesProvider } from './conanDependencies';
@@ -26,6 +26,7 @@ export function activate(context: vscode.ExtensionContext) {
         fs.mkdirSync(conan_tmpFolder);
     }
     const conanDependencyProvider = new ConanDependenciesProvider(rootPath);
+    vscode.window.registerTreeDataProvider('conan.configure', conanDependencyProvider);
 
     vscode.commands.registerCommand('conan.install', () => {
         

@@ -16,22 +16,22 @@
     "main": "./out/extension",
     "contributes": {
         "viewsContainers": {
-			"activitybar": [
-				{
-					"id": "conan_tools",
-					"title": "Conan Tools",
-					"icon": "res/conan_icon.svg"
-				}
-			]
+            "activitybar": [
+                {
+                    "id": "conan_tools",
+                    "title": "Conan Tools",
+                    "icon": "res/conan_icon.svg"
+                }
+            ]
         },
         "views": {
-            "explorer":[
+            "explorer": [
                 {
                     "id": "conan.configure",
                     "name": "conan"
                 }
             ]
-		},
+        },
         "commands": [
             {
                 "command": "conan.install",
@@ -45,7 +45,7 @@
             },
             {
                 "command": "conan.selectProfile",
-                "title":"Select a conan profile"
+                "title": "Select a conan profile"
             },
             {
                 "command": "conan.options",
@@ -75,12 +75,10 @@
                 {
                     "command": "conan.selectProfile",
                     "when": "view == conan.configure"
-                    
                 },
                 {
                     "command": "conan.options",
                     "when": "view == conan.configure"
-                    
                 }
             ]
         }
