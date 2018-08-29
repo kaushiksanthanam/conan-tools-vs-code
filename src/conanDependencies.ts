@@ -31,11 +31,7 @@ export class ConanDependenciesProvider implements vscode.TreeDataProvider<ConanD
             });
         }
         return new Promise((resolve, rejected) => {
-            if (ret) {
-                resolve(ret);
-            } else {
-                rejected(Error('getChildren() Method cannot return dependency list'));
-            }
+            resolve(ret);
         });
     }
 
@@ -75,7 +71,8 @@ export class ConanDependenciesProvider implements vscode.TreeDataProvider<ConanD
                                 let split = line.split("->");
                                 if (split.length > 0) {
                                     let parentLabel = split[0];
-                                    parentLabel = parentLabel.replace("\"", "");
+                                    parentLabel = parentLabel.replace("\"", "").trim();
+                                    parentLabel = parentLabel.replace(/"/g, '');
                                     let parentConan = new ConanDependency(parentLabel, vscode.TreeItemCollapsibleState.Collapsed);
 
                                     let childrenConan: ConanDependency[] = [];
@@ -86,7 +83,8 @@ export class ConanDependenciesProvider implements vscode.TreeDataProvider<ConanD
                                     let cleanChildren = children.split(' ');
                                     cleanChildren.forEach(cleanChild => {
                                         if (cleanChild !== '' && cleanChild !== ' ') {
-                                            let cleanChildConan = new ConanDependency(cleanChild, vscode.TreeItemCollapsibleState.Collapsed);
+                                            let childLabel = cleanChild.trim();
+                                            let cleanChildConan = new ConanDependency(childLabel, vscode.TreeItemCollapsibleState.Collapsed);
                                             childrenConan.push(cleanChildConan);
                                         }
                                     });
@@ -123,6 +121,6 @@ class ConanDependency extends vscode.TreeItem {
         return `${this.label}`;
     }
 
-    iconPath = path.join(__filename, '..', '..', '..', 'res', 'dependency.svg');
+    iconPath = vscode.workspace.rootPath + '/res/dependency.svg';
     contextValue = 'dependency';
 }
