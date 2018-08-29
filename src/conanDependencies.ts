@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
 import * as fs from 'fs';
 import { exec } from 'child_process';
 
@@ -16,19 +15,11 @@ export class ConanDependenciesProvider implements vscode.TreeDataProvider<ConanD
     }
 
     getChildren(element?: ConanDependency): vscode.ProviderResult<ConanDependency[]> {
-        let ret: ConanDependency[];
+        let ret: ConanDependency[] | undefined;
         if (element === undefined) {
-            this.dependencies.forEach(dep => {
-                if (dep.parent.label.includes('@PROJECT')) {
-                    ret = dep.children;
-                }
-            });
+            ret = this.dependencies.get('ROOT');
         } else {
-            this.dependencies.forEach(dep => {
-                if (dep.parent.label === element.label) {
-                    ret = dep.children;
-                }
-            });
+            ret = this.dependencies.get(element.label);
         }
         return new Promise((resolve, rejected) => {
             resolve(ret);
@@ -39,7 +30,7 @@ export class ConanDependenciesProvider implements vscode.TreeDataProvider<ConanD
         this._onDidChangeTreeData.fire();
     }
 
-    constructor(private workspace: string | undefined, private dependencies: Dependency[] = []) {
+    constructor(private workspace: string | undefined, private dependencies: Map<string, ConanDependency[]> = new Map()) {
         // 1. run conan info command
         // 2. collect the results into txt file
         // 3. Read and parse the text file
@@ -73,6 +64,9 @@ export class ConanDependenciesProvider implements vscode.TreeDataProvider<ConanD
                                     let parentLabel = split[0];
                                     parentLabel = parentLabel.replace("\"", "").trim();
                                     parentLabel = parentLabel.replace(/"/g, '');
+                                    if (parentLabel.includes('@PROJECT')) {
+                                        parentLabel = 'ROOT';
+                                    }
                                     let parentConan = new ConanDependency(parentLabel, vscode.TreeItemCollapsibleState.Collapsed);
 
                                     let childrenConan: ConanDependency[] = [];
@@ -89,8 +83,8 @@ export class ConanDependenciesProvider implements vscode.TreeDataProvider<ConanD
                                         }
                                     });
 
-                                    let dependency = new Dependency(parentConan, childrenConan);
-                                    this.dependencies.push(dependency);
+                                    // let dependency = new Dependency(parentConan, childrenConan);
+                                    this.dependencies.set(parentConan.label, childrenConan);
                                     this.refresh();
                                 }
                             }
@@ -103,12 +97,7 @@ export class ConanDependenciesProvider implements vscode.TreeDataProvider<ConanD
     }
 }
 
-class Dependency {
-    constructor(public readonly parent: ConanDependency,
-        public readonly children: ConanDependency[]) {
 
-    }
-}
 class ConanDependency extends vscode.TreeItem {
     constructor(
         public readonly label: string,
