@@ -2,7 +2,7 @@
     "name": "conan-tools",
     "displayName": "conan-tools",
     "description": "VS Code extension for conan tools",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "publisher": "Keysight",
     "engines": {
         "vscode": "^1.26.0"
@@ -11,19 +11,10 @@
         "Other"
     ],
     "activationEvents": [
-        "workspaceContains:conanfile.py"
+        "workspaceContains:conanfile"
     ],
     "main": "./out/extension",
     "contributes": {
-        "viewsContainers": {
-            "activitybar": [
-                {
-                    "id": "conan_tools",
-                    "title": "Conan Tools",
-                    "icon": "res/conan_icon.svg"
-                }
-            ]
-        },
         "views": {
             "explorer": [
                 {
@@ -36,20 +27,18 @@
             {
                 "command": "conan.install",
                 "title": "Install",
-                "icon": "res/conan_install.svg"
+                "icon": {
+                    "light": "resources/light/install.png",
+                    "dark": "resources/dark/install.png"
+                }
             },
             {
                 "command": "conan.build",
                 "title": "Build",
-                "icon": "res/conan_build.png"
-            },
-            {
-                "command": "conan.selectProfile",
-                "title": "Select a conan profile"
-            },
-            {
-                "command": "conan.options",
-                "title": "Set options for conan install"
+                "icon": {
+                    "light": "resources/light/build.png",
+                    "dark": "resources/dark/build.png"
+                }
             }
         ],
         "menus": {
@@ -63,24 +52,31 @@
             ],
             "view/title": [
                 {
-                    "command": "conan.build",
-                    "when": "view == conan.configure",
-                    "group": "navigation"
-                },
-                {
                     "command": "conan.install",
                     "when": "view == conan.configure",
                     "group": "navigation"
                 },
                 {
-                    "command": "conan.selectProfile",
-                    "when": "view == conan.configure"
-                },
-                {
-                    "command": "conan.options",
-                    "when": "view == conan.configure"
+                    "command": "conan.build",
+                    "when": "view == conan.configure",
+                    "group": "navigation"
                 }
             ]
+        },
+        "configuration":{            
+            "title": "Conan Configuration",
+            "properties": {
+                "conan.installCommand": {
+                    "type": ["string"],
+                    "default": "conan install ..",
+                    "description": "Custom conan install command for the workspace"
+                },
+                "conan.buildCommand": {
+                    "type": ["string"],
+                    "default": "conan build ..",
+                    "description": "Custom conan build command for the workspace"
+                }
+            }
         }
     },
     "scripts": {
