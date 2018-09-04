@@ -11,7 +11,7 @@
         "Other"
     ],
     "activationEvents": [
-        "workspaceContains:conanfile"
+        "workspaceContains:conanfile.py"
     ],
     "main": "./out/extension",
     "contributes": {
@@ -63,16 +63,20 @@
                 }
             ]
         },
-        "configuration":{            
+        "configuration": {
             "title": "Conan Configuration",
             "properties": {
                 "conan.installCommand": {
-                    "type": ["string"],
+                    "type": [
+                        "string"
+                    ],
                     "default": "conan install ..",
                     "description": "Custom conan install command for the workspace"
                 },
                 "conan.buildCommand": {
-                    "type": ["string"],
+                    "type": [
+                        "string"
+                    ],
                     "default": "conan build ..",
                     "description": "Custom conan build command for the workspace"
                 }
