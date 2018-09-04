@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
-import * as path from 'path';
 import { exec } from 'child_process';
 
 let conanToolsFolderPath: string | undefined;
@@ -59,7 +58,6 @@ export class ConanDependenciesProvider implements vscode.TreeDataProvider<ConanD
         } else {
             this.createConanInfo();
         }
-        this.refresh();
     }
 
     createConanInfo() {
@@ -116,49 +114,8 @@ export class ConanDependenciesProvider implements vscode.TreeDataProvider<ConanD
                     }
                 }
             }
-        });  
-
-
-        // fs.readFile(conanToolsInfoFilePath, (err, data) => {
-        //     if (err) {
-        //         vscode.window.showErrorMessage('Could not read conanInfo.dot');
-        //     }
-        //     else {
-        //         let fileContents = data.toString();
-        //         let lines = fileContents.split('\n');
-
-        //         lines.forEach(line => {
-        //             if (!(line.startsWith("}")) && !(line.startsWith('digraph'))) {
-        //                 let split = line.split("->");
-        //                 if (split.length > 0) {
-        //                     let parentLabel = split[0];
-        //                     parentLabel = parentLabel.replace("\"", "").trim();
-        //                     parentLabel = parentLabel.replace(/"/g, '');
-        //                     if (parentLabel.includes('@PROJECT')) {
-        //                         parentLabel = 'ROOT';
-        //                     }
-                            
-        //                     let childrenConan: string[] = [];
-        //                     let children = split[1];
-        //                     children = children.replace('{', '');
-        //                     children = children.replace('}', '');
-        //                     children = children.replace(/"/g, '');
-        //                     let cleanChildren = children.split(' ');
-        //                     cleanChildren.forEach(cleanChild => {
-        //                         if (cleanChild !== '' && cleanChild !== ' ') {
-        //                             let childLabel = cleanChild.trim();
-        //                             childrenConan.push(childLabel);
-        //                         }
-        //                     });
-        //                     if(childrenConan.length > 0) {                      
-        //                         this.dependencies.set(parentLabel, childrenConan);
-        //                     }
-        //                 }
-        //             }
-        //         });               
-        //     }
-        //     this.refresh();
-        // });
+        });
+        this.refresh();
     }
 }
 
@@ -175,10 +132,4 @@ class ConanDependency extends vscode.TreeItem {
         return `${this.label}`;
     }
 
-    iconPath = {
-		light: path.join(__filename, '..', '..', '..', 'resources', 'light', 'dependency.png'),
-		dark: path.join(__filename, '..', '..', '..', 'resources', 'dark', 'dependency.png')
-	};
-
-    contextValue = 'dependency';
 }
