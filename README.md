@@ -1,4 +1,4 @@
-# CONAN-TOOLS
+# Conan-Tools
 
 Welcome to the VS Code extension for conan tools!
 
@@ -10,19 +10,19 @@ This extension activates automatically when a workspace contains a `conanfile.py
 ## Features
 ---
 ### Install conan dependencies
-![](https://github.com/kaushiksanthanam/conan-tools-vs-code/resources/media/installation.gif)
+![Installing](/resources/media/installation.gif?raw=true)
 
 ---
 ### Build conan based projects
-![](https://github.com/kaushiksanthanam/conan-tools-vs-code/resources/media/building.gif)
+![Building](/resources/media/building.gif?raw=true)
 
 ---
 ### View Nested Conan Dependencies
-![](https://github.com/kaushiksanthanam/conan-tools-vs-code/resources/media/view_dependencies.gif)
+![View](/resources/media/view_dependencies.gif?raw=true)
 
 ---
 ### Custom install and build commands tailored for each workspace
-![](https://github.com/kaushiksanthanam/conan-tools-vs-code/resources/media/custom_install_command.gif)
+![Custom](/resources/media/custom_install_command.gif?raw=true)
 
 
 ## Requirements
