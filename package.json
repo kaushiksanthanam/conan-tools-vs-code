@@ -100,5 +100,6 @@
     "repository": {
         "url": "https://github.com/kaushiksanthanam/conan-tools-vs-code.git"
     },
-    "icon": "resources/media/extension.ico"
+    "icon": "resources/media/extension.ico",
+    "license": "LICENSE.txt"
 }
