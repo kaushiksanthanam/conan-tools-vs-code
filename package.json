@@ -11,7 +11,8 @@
         "Other"
     ],
     "activationEvents": [
-        "workspaceContains:conanfile.py"
+        "workspaceContains:conanfile.py",
+        "workspaceContains:conanfile.txt"
     ],
     "main": "./out/extension",
     "contributes": {
